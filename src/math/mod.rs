@@ -16,26 +16,52 @@ pub fn cal() {
       break;
     }
 
-    let token: Vec<String> = input
-      .trim()
-      .split_whitespace()
-      .map(|t| {
-        if t.eq_ignore_ascii_case("ans") {
-          last_ans.to_string()
-        } else {
-          t.to_string()
-        }
-      })
-      .collect();
+    let cinput = input.replace("ans", (last_ans.to_string()).as_str());
+    let token: Vec<String> = tokenizer(cinput.as_str());
 
-    let rebuilt = token.join(" ");
-
-    match eval(&rebuilt.trim()) {
+    match eval(token) {
       Ok(value) => {
         println!("{}", value);
         last_ans = value
       }
       Err(value) => println!("Err {}", value),
     }
+  }
+}
+
+fn tokenizer(input: &str) -> Vec<String> {
+  let cinput = input
+    .trim()
+    .chars()
+    .filter(|c| !c.is_whitespace())
+    .collect::<String>();
+  let mut curent: String = String::new();
+  let mut output: Vec<String> = vec![];
+  for c in cinput.chars() {
+    if c.is_digit(10) || c == '.' {
+      curent.push(c);
+    } else if "*/-+^()".contains(c) {
+      if !curent.is_empty() {
+        output.push(std::mem::take(&mut curent));
+      }
+      output.push(c.to_string());
+    }
+  }
+  if !curent.is_empty() {
+    output.push(std::mem::take(&mut curent));
+  }
+  output
+}
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn ts_tokenizer() {
+    let output = tokenizer("-10+4-5+");
+    println!("{:?}", output);
+
+    assert_eq!(output, vec!["10", "-", "4", "+", "5"]);
   }
 }
