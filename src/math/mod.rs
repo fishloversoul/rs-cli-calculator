@@ -49,6 +49,7 @@ fn tokenizer(input: &str) -> Vec<String> {
       }
       if !curent.is_empty() {
         output.push(std::mem::take(&mut curent));
+        is_number = true;
       }
       output.push(c.to_string());
     }
