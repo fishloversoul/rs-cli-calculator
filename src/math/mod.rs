@@ -37,10 +37,16 @@ fn tokenizer(input: &str) -> Vec<String> {
     .collect::<String>();
   let mut curent: String = String::new();
   let mut output: Vec<String> = vec![];
+  let mut is_number = true;
   for c in cinput.chars() {
     if c.is_digit(10) || c == '.' {
       curent.push(c);
+      is_number = false;
     } else if "*/-+^()".contains(c) {
+      if "-".contains(c) && is_number == true {
+        curent.push(c);
+        continue;
+      }
       if !curent.is_empty() {
         output.push(std::mem::take(&mut curent));
       }
@@ -59,9 +65,9 @@ mod test {
 
   #[test]
   fn ts_tokenizer() {
-    let output = tokenizer("-10+4-5+");
+    let output = tokenizer("-10+4-5");
     println!("{:?}", output);
 
-    assert_eq!(output, vec!["10", "-", "4", "+", "5"]);
+    assert_eq!(output, vec!["-10", "+", "4", "-", "5"]);
   }
 }
