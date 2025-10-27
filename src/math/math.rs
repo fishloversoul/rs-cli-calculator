@@ -47,26 +47,29 @@ fn reducs_ops(parts: &mut Vec<String>, symbol: &str, symbol1: &str) -> Result<()
 fn perent_t(parts: &mut Vec<String>) -> Result<(), String> {
   let mut i = 0;
   while i < parts.len() {
+    let mut depth = 0;
+    let start = i;
+    let mut end = i + 1;
     if parts[i] == "(" {
-      let mut l = i + 1;
-      while l < parts.len() {
-        if parts[l] == ")" {
-          break;
-        } else {
-          l += 1;
+      depth += 1;
+      while !(depth == 0) {
+        if parts[end] == "(" {
+          depth += 1;
+        } else if parts[end] == ")" {
+          depth -= 1;
         }
+        if depth == 0 {
+          break;
+        }
+        end += 1;
       }
-      let mut parts1 = parts[i + 1..l].to_vec();
-      //println!("{:?}", parts1);
-      red_ops_do(&mut parts1)?;
-      let answer = parts1[0].to_string();
-      parts[i] = answer;
-      for _u in 0..(l - i) {
+      let mut inner_parts: Vec<String> = parts[start + 1..end].to_vec();
+      perent_t(&mut inner_parts)?;
+      red_ops_do(&mut inner_parts)?;
+      parts[i] = inner_parts[0].to_string();
+      for _ in 0..(end - start) {
         parts.remove(i + 1);
       }
-      //println!("{:?}", parts1);
-      //println!("{:?}", parts);
-      //println!("worked");
     } else {
       i += 1;
     }
