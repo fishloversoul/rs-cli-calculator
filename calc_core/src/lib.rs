@@ -1,5 +1,12 @@
-pub fn eval(input: Vec<String>) -> Result<f32, String> {
-  let mut parts: Vec<String> = input;
+#![no_std]
+extern crate alloc;
+
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+
+pub fn eval(input: String) -> Result<f32, String> {
+  let mut parts: Vec<String> = tokenizer(&input);
   perent_t(&mut parts)?;
   red_ops_do(&mut parts)?;
   let result = parts[0]
@@ -31,7 +38,7 @@ fn reducs_ops(parts: &mut Vec<String>, symbol: &str, symbol1: &str) -> Result<()
         }
         "+" => num1 + num2,
         "-" => num1 - num2,
-        "^" => num1.powf(num2),
+        "^" => powf(num1, num2 as i32),
         _ => return Err("unknown operator".to_string()),
       };
       parts[i - 1] = result.to_string();
@@ -82,4 +89,59 @@ fn red_ops_do(mut parts: &mut Vec<String>) -> Result<(), String> {
   reducs_ops(&mut parts, "*", "/")?;
   reducs_ops(&mut parts, "+", "-")?;
   Ok(())
+}
+
+fn tokenizer(input: &str) -> Vec<String> {
+  let cinput = input
+    .trim()
+    .chars()
+    .filter(|c| !c.is_whitespace())
+    .collect::<String>();
+  let mut curent: String = String::new();
+  let mut output: Vec<String> = Vec::new();
+  let mut is_number = true;
+  for c in cinput.chars() {
+    if c.is_digit(10) || c == '.' {
+      curent.push(c);
+      is_number = false;
+    } else if "*/-+^()".contains(c) {
+      if c == '-' && is_number == true {
+        curent.push(c);
+        continue;
+      }
+      if !curent.is_empty() {
+        output.push(core::mem::take(&mut curent));
+      }
+      if c != ')' {
+        is_number = true;
+      }
+      output.push(c.to_string());
+    }
+  }
+  if !curent.is_empty() {
+    output.push(core::mem::take(&mut curent));
+  }
+  output
+}
+
+fn powf(base: f32, exp: i32) -> f32 {
+  if exp == 0 {
+    return 1.0;
+  }
+
+  let mut result = 1.0;
+  let mut times = exp;
+  let b = base;
+
+  let invert = times < 0;
+  if invert {
+    times = -times;
+  }
+
+  while times > 0 {
+    result *= b;
+    times -= 1;
+  }
+
+  if invert { 1.0 / result } else { result }
 }
