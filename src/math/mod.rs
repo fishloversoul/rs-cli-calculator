@@ -43,18 +43,21 @@ fn tokenizer(input: &str) -> Vec<String> {
       curent.push(c);
       is_number = false;
     } else if "*/-+^()".contains(c) {
-      if "-".contains(c) && is_number == true {
+      if c == '-' && is_number == true {
         curent.push(c);
         continue;
       }
       if !curent.is_empty() {
         output.push(std::mem::take(&mut curent));
+      }
+      if c != ')' {
         is_number = true;
       }
       output.push(c.to_string());
     }
   }
   if !curent.is_empty() {
+    println!("2 {}", curent);
     output.push(std::mem::take(&mut curent));
   }
   output
@@ -66,9 +69,12 @@ mod test {
 
   #[test]
   fn ts_tokenizer() {
-    let output = tokenizer("-10+4-5");
+    let output = tokenizer("-10+(30-40)-20");
     println!("{:?}", output);
 
-    assert_eq!(output, vec!["-10", "+", "4", "-", "5"]);
+    assert_eq!(
+      output,
+      vec!["-10", "+", "(", "30", "-", "40", ")", "-", "20"]
+    );
   }
 }
