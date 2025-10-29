@@ -22,4 +22,4 @@ The backend takes a string, tokenises it into a Vector, gets rid of parentheses 
 The backend can run on any system if you port it over. It only about 1.17 mb for the entire thing on a windows exe that includes the frontend and all the thing to make it run on windows if you got ride of the extra stuff it could come down to about 0.5 mb. The backend is only 147 lines of code. Currently does not support exponent power of floats it can do base floats. I will work later on updating it to support exponent power of floats.
 
 
-[backend deep dive](https://github.com/fishloversoul/rs-cli-calculator/tree/main/calc_core)
+[backend deep dive](https://github.com/fishloversoul/rs-cli-calculator/blob/main/calc_core/backend.md)
